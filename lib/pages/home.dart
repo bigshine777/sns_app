@@ -5,6 +5,7 @@ import 'package:sns_app/pages/albums.dart';
 import 'package:sns_app/pages/footer.dart';
 import 'package:sns_app/pages/pictures.dart';
 import 'package:sns_app/pages/posts.dart';
+import 'package:sns_app/pages/setting.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -22,7 +23,7 @@ class HomePage extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
@@ -30,6 +31,15 @@ class HomePage extends ConsumerWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                ),
+              ),
+              InkWell(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const SettingPage()),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(Icons.settings, color: Colors.white, size: 32),
                 ),
               ),
             ],

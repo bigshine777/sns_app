@@ -8,6 +8,18 @@ import 'package:sns_app/repositories/picture.dart';
 import 'package:sns_app/repositories/post.dart';
 import 'package:sns_app/repositories/user.dart';
 
+class IsDarkNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  bool get isDark => state;
+  set isDark(bool isDark) => state = isDark;
+}
+
+final isDarkProvider = NotifierProvider<IsDarkNotifier, bool>(
+  IsDarkNotifier.new,
+);
+
 class UsernameNotifier extends Notifier<String> {
   @override
   String build() => 'guest';
