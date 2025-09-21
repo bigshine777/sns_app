@@ -44,80 +44,6 @@ final pageIndexProvider = NotifierProvider<PageIndexNotifier, int>(
   PageIndexNotifier.new,
 );
 
-class PostsNotifier extends AsyncNotifier<List<Post>> {
-  @override
-  Future<List<Post>> build() async {
-    final posts = await getPosts();
-    return posts;
-  }
-
-  void toggleLike(int postId) {
-    state = state.whenData(
-      (posts) => posts
-          .map(
-            (post) => post.id == postId
-                ? post.copyWith(isLiked: !post.isLiked)
-                : post,
-          )
-          .toList(),
-    );
-  }
-
-  List<Post> get posts => state.value ?? [];
-  set posts(List<Post> posts) {
-    state = AsyncData(posts);
-  }
-}
-
-final postsNotifierProvider = AsyncNotifierProvider<PostsNotifier, List<Post>>(
-  PostsNotifier.new,
-);
-
-class AlbumsNotifier extends AsyncNotifier<List<Album>> {
-  @override
-  Future<List<Album>> build() async {
-    final albums = await getAlbums();
-    return albums;
-  }
-
-  void toggleLike(int albumId) {
-    state = state.whenData(
-      (albums) => albums
-          .map(
-            (album) => album.id == albumId
-                ? album.copyWith(isLiked: !album.isLiked)
-                : album,
-          )
-          .toList(),
-    );
-  }
-
-  List<Album> get albums => state.value ?? [];
-  set albums(List<Album> albums) {
-    state = AsyncData(albums);
-  }
-}
-
-final albumsNotifierProvider =
-    AsyncNotifierProvider<AlbumsNotifier, List<Album>>(AlbumsNotifier.new);
-
-class UsersNotifier extends AsyncNotifier<List<User>> {
-  @override
-  Future<List<User>> build() async {
-    final users = await getUsers();
-    return users;
-  }
-
-  List<User> get users => state.value ?? [];
-  set users(List<User> users) {
-    state = AsyncData(users);
-  }
-}
-
-final usersNotifierProvider = AsyncNotifierProvider<UsersNotifier, List<User>>(
-  UsersNotifier.new,
-);
-
 class PicturesNotifier extends AsyncNotifier<List<Picture>> {
   @override
   Future<List<Picture>> build() async {
@@ -143,7 +69,90 @@ class PicturesNotifier extends AsyncNotifier<List<Picture>> {
   }
 }
 
-final picturesNotifierProvider =
-    AsyncNotifierProvider<PicturesNotifier, List<Picture>>(
-      PicturesNotifier.new,
+final picturesProvider = AsyncNotifierProvider<PicturesNotifier, List<Picture>>(
+  PicturesNotifier.new,
+);
+
+class PostsPageData {
+  final List<Post> posts;
+  final List<User> users;
+
+  PostsPageData({required this.posts, required this.users});
+}
+
+class PostsPageNotifier extends AsyncNotifier<PostsPageData> {
+  @override
+  Future<PostsPageData> build() async {
+    final results = await Future.wait([getPosts(), getUsers()]);
+
+    final posts = results[0] as List<Post>;
+    final users = results[1] as List<User>;
+
+    return PostsPageData(posts: posts, users: users);
+  }
+
+  void toggleLike(int postId) {
+    state = state.whenData((data) {
+      final updatedPosts = data.posts
+          .map(
+            (post) => post.id == postId
+                ? post.copyWith(isLiked: !post.isLiked)
+                : post,
+          )
+          .toList();
+      return PostsPageData(posts: updatedPosts, users: data.users);
+    });
+  }
+}
+
+final postsPageProvider =
+    AsyncNotifierProvider<PostsPageNotifier, PostsPageData>(
+      PostsPageNotifier.new,
+    );
+
+class AlbumsPageData {
+  final List<Album> albums;
+  final List<User> users;
+  final List<Picture> pictures;
+
+  AlbumsPageData({
+    required this.albums,
+    required this.users,
+    required this.pictures,
+  });
+}
+
+class AlbumsPageNotifier extends AsyncNotifier<AlbumsPageData> {
+  @override
+  Future<AlbumsPageData> build() async {
+    final results = await Future.wait([getAlbums(), getUsers(), getPictures()]);
+
+    final albums = results[0] as List<Album>;
+    final users = results[1] as List<User>;
+    final pictures = results[2] as List<Picture>;
+
+    return AlbumsPageData(albums: albums, users: users, pictures: pictures);
+  }
+
+  void toggleLike(int postId) {
+    state = state.whenData((data) {
+      final updatedAlbums = data.albums
+          .map(
+            (post) => post.id == postId
+                ? post.copyWith(isLiked: !post.isLiked)
+                : post,
+          )
+          .toList();
+      return AlbumsPageData(
+        albums: updatedAlbums,
+        users: data.users,
+        pictures: data.pictures,
+      );
+    });
+  }
+}
+
+final albumsPageProvider =
+    AsyncNotifierProvider<AlbumsPageNotifier, AlbumsPageData>(
+      AlbumsPageNotifier.new,
     );

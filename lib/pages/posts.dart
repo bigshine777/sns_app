@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sns_app/models/post.dart';
+import 'package:sns_app/models/user.dart';
 import 'package:sns_app/notifiers.dart';
 import 'package:sns_app/pages/app_bar.dart';
 import 'package:sns_app/pages/footer.dart';
@@ -10,13 +11,15 @@ class PostsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final posts = ref.watch(postsNotifierProvider);
+    final dataAsync = ref.watch(postsPageProvider);
 
     return Scaffold(
       appBar: const CustomAppBar(title: '投稿', isSetting: false),
-      body: posts.when(
+      body: dataAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        data: (posts) {
+        data: (data) {
+          final posts = data.posts;
+          final users = data.users;
           if (posts.isEmpty) {
             return const Center(child: Text('投稿はありません'));
           }
@@ -25,7 +28,8 @@ class PostsPage extends ConsumerWidget {
             itemCount: posts.length,
             itemBuilder: (context, index) {
               final post = posts[index];
-              return PostCard(post: post);
+              final user = users.firstWhere((u) => u.id == post.userId);
+              return PostCard(post: post, user: user);
             },
           );
         },
@@ -38,13 +42,12 @@ class PostsPage extends ConsumerWidget {
 
 class PostCard extends ConsumerWidget {
   final Post post;
+  final User user;
 
-  const PostCard({super.key, required this.post});
+  const PostCard({super.key, required this.post, required this.user});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final users = ref.watch(usersNotifierProvider);
-
     return Card(
       margin: const EdgeInsets.all(5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -57,30 +60,13 @@ class PostCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Consumer(
-              builder: (context, ref, child) => users.when(
-                loading: () => const Center(
-                  child: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-                data: (users) {
-                  final user = users.firstWhere(
-                    (user) => user.id == post.userId,
-                  );
-                  return Text(
-                    '${user.name}  @${user.username}',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                  );
-                },
-                error: (err, stack) => Text('Error: $err'),
+            Text(
+              '${user.name}  @${user.username}',
+              style: TextStyle(
+                fontSize: 15,
+                color: Theme.of(context).brightness == Brightness.light
+                    ? Colors.black
+                    : Colors.white,
               ),
             ),
             const SizedBox(height: 5),
@@ -109,7 +95,7 @@ class PostCard extends ConsumerWidget {
               alignment: Alignment.bottomRight,
               child: InkWell(
                 onTap: () {
-                  ref.read(postsNotifierProvider.notifier).toggleLike(post.id);
+                  ref.read(postsPageProvider.notifier).toggleLike(post.id);
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10, right: 20, left: 20),

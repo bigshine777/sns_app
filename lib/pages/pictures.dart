@@ -11,7 +11,7 @@ class PicturesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final picturesAsync = ref.watch(picturesNotifierProvider);
+    final picturesAsync = ref.watch(picturesProvider);
 
     return Scaffold(
       appBar: const CustomAppBar(title: '写真', isSetting: false),
@@ -70,9 +70,7 @@ class PictureCard extends ConsumerWidget {
             bottom: 10,
             child: InkWell(
               onTap: () {
-                ref
-                    .read(picturesNotifierProvider.notifier)
-                    .toggleLike(picture.id);
+                ref.read(picturesProvider.notifier).toggleLike(picture.id);
               },
               child: Icon(
                 picture.isLiked ? Icons.favorite : Icons.favorite_outline,

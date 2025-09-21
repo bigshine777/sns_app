@@ -13,10 +13,9 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final username = ref.watch(usernameProvider);
-    final albumsAsync = ref.watch(albumsNotifierProvider);
-    final usersAsync = ref.watch(usersNotifierProvider);
-    final picturesAsync = ref.watch(picturesNotifierProvider);
-    final postsAsync = ref.watch(postsNotifierProvider);
+    final postsPageAsync = ref.watch(postsPageProvider);
+    final albumsPageAsync = ref.watch(albumsPageProvider);
+    final picturesAsync = ref.watch(picturesProvider);
 
     return DefaultTabController(
       length: 3,
@@ -24,9 +23,11 @@ class HomePage extends ConsumerWidget {
         appBar: CustomAppBar(title: '$username のお気に入り', isSetting: true),
         body: TabBarView(
           children: [
-            postsAsync.when(
+            postsPageAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              data: (posts) {
+              data: (data) {
+                final posts = data.posts;
+                final users = data.users;
                 if (posts.isEmpty) {
                   return const Center(child: Text('投稿はありません'));
                 }
@@ -36,26 +37,24 @@ class HomePage extends ConsumerWidget {
                   itemCount: filteredPosts.length,
                   itemBuilder: (context, index) {
                     final post = filteredPosts[index];
-                    return PostCard(post: post);
+                    final user = users.firstWhere((u) => u.id == post.userId);
+                    return PostCard(post: post, user: user);
                   },
                 );
               },
               error: (err, stack) => Text('Error: $err'),
             ),
-            albumsAsync.when(
+            albumsPageAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, stack) => Text('Error: $err'),
-              data: (albums) {
+              data: (data) {
+                final albums = data.albums;
+                final users = data.users;
+                final pictures = data.pictures;
+
                 if (albums.isEmpty) {
                   return const Center(child: Text('アルバムはありません'));
                 }
-
-                if (usersAsync.isLoading || picturesAsync.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final users = usersAsync.value!;
-                final pictures = picturesAsync.value!;
                 final filteredAlbums = albums.where((a) => a.isLiked).toList();
 
                 return GridView.builder(

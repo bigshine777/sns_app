@@ -13,24 +13,18 @@ class AlbumsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final albumsAsync = ref.watch(albumsNotifierProvider);
-    final usersAsync = ref.watch(usersNotifierProvider);
-    final picturesAsync = ref.watch(picturesNotifierProvider);
+    final dataAsync = ref.watch(albumsPageProvider);
 
     return Scaffold(
       appBar: const CustomAppBar(title: 'アルバム', isSetting: false),
-      body: albumsAsync.when(
+      body: dataAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Text('Error: $err'),
-        data: (albums) {
+        data: (data) {
+          final albums = data.albums;
+          final users = data.users;
+          final pictures = data.pictures;
           if (albums.isEmpty) return const Center(child: Text('アルバムはありません'));
-
-          if (usersAsync.isLoading || picturesAsync.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final users = usersAsync.value!;
-          final pictures = picturesAsync.value!;
 
           return GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -43,8 +37,6 @@ class AlbumsPage extends ConsumerWidget {
             itemBuilder: (context, index) {
               final album = albums[index];
               final user = users.firstWhere((u) => u.id == album.userId);
-              // final picture = pictures.
-              //firstWhere((p) => p.albumId == album.id);
 
               return AlbumCard(album: album, user: user, pictures: pictures);
             },
@@ -120,16 +112,14 @@ class AlbumCard extends ConsumerWidget {
               bottom: 10,
               child: InkWell(
                 onTap: () {
-                  ref
-                      .read(albumsNotifierProvider.notifier)
-                      .toggleLike(album.id);
+                  ref.read(albumsPageProvider.notifier).toggleLike(album.id);
 
                   for (var picture in pictures) {
                     if (picture.albumId == album.id &&
                         !album.isLiked &&
                         !picture.isLiked) {
                       ref
-                          .read(picturesNotifierProvider.notifier)
+                          .read(picturesProvider.notifier)
                           .toggleLike(picture.id);
                     }
                   }
