@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sns_app/models/post.dart';
 import 'package:sns_app/notifiers.dart';
+import 'package:sns_app/pages/app_bar.dart';
 import 'package:sns_app/pages/footer.dart';
 
 class PostsPage extends ConsumerWidget {
@@ -12,22 +13,7 @@ class PostsPage extends ConsumerWidget {
     final posts = ref.watch(postsNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              '投稿',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.blue[400],
-      ),
+      appBar: const CustomAppBar(title: '投稿', isSetting: false),
       body: posts.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         data: (posts) {
@@ -63,7 +49,9 @@ class PostCard extends ConsumerWidget {
       margin: const EdgeInsets.all(5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 1,
-      color: Colors.white,
+      color: Theme.of(context).brightness == Brightness.light
+          ? Colors.white
+          : Colors.grey[800],
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -84,7 +72,12 @@ class PostCard extends ConsumerWidget {
                   );
                   return Text(
                     '${user.name}  @${user.username}',
-                    style: const TextStyle(fontSize: 15, color: Colors.black),
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? Colors.black
+                          : Colors.white,
+                    ),
                   );
                 },
                 error: (err, stack) => Text('Error: $err'),
@@ -93,17 +86,24 @@ class PostCard extends ConsumerWidget {
             const SizedBox(height: 5),
             Text(
               post.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
-                color: Colors.black,
+                color: Theme.of(context).brightness == Brightness.light
+                    ? Colors.black
+                    : Colors.white,
               ),
             ),
             Text(
               post.body,
               maxLines: 4,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 15, color: Colors.black),
+              style: TextStyle(
+                fontSize: 15,
+                color: Theme.of(context).brightness == Brightness.light
+                    ? Colors.black
+                    : Colors.white,
+              ),
             ),
             Align(
               alignment: Alignment.bottomRight,

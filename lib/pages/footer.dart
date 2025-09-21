@@ -17,7 +17,7 @@ class Footer extends ConsumerWidget {
         ),
         BottomNavigationBarItem(icon: Icon(Icons.filter), label: 'アルバム'),
         BottomNavigationBarItem(icon: Icon(Icons.crop_original), label: '写真'),
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: '写真'),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'ホーム'),
       ],
       onTap: (final index) {
         if (Navigator.of(context).canPop()) {

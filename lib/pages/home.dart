@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sns_app/notifiers.dart';
 import 'package:sns_app/pages/albums.dart';
+import 'package:sns_app/pages/app_bar.dart';
 import 'package:sns_app/pages/footer.dart';
 import 'package:sns_app/pages/pictures.dart';
 import 'package:sns_app/pages/posts.dart';
-import 'package:sns_app/pages/setting.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -21,38 +21,7 @@ class HomePage extends ConsumerWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                '$username のお気に入り',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              InkWell(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const SettingPage()),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.settings, color: Colors.white, size: 32),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.blue[400],
-          bottom: const TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.textsms_outlined, color: Colors.white)),
-              Tab(icon: Icon(Icons.filter, color: Colors.white)),
-              Tab(icon: Icon(Icons.crop_original, color: Colors.white)),
-            ],
-          ),
-        ),
+        appBar: CustomAppBar(title: '$username のお気に入り', isSetting: true),
         body: TabBarView(
           children: [
             postsAsync.when(

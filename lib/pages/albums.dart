@@ -4,6 +4,7 @@ import 'package:sns_app/models/album.dart';
 import 'package:sns_app/models/picture.dart';
 import 'package:sns_app/models/user.dart';
 import 'package:sns_app/notifiers.dart';
+import 'package:sns_app/pages/app_bar.dart';
 import 'package:sns_app/pages/footer.dart';
 import 'package:sns_app/pages/pictures.dart';
 
@@ -17,22 +18,7 @@ class AlbumsPage extends ConsumerWidget {
     final picturesAsync = ref.watch(picturesNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'アルバム',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.blue[400],
-      ),
+      appBar: const CustomAppBar(title: 'アルバム', isSetting: false),
       body: albumsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Text('Error: $err'),
@@ -109,7 +95,10 @@ class AlbumCard extends ConsumerWidget {
             Positioned(
               left: 15,
               top: 15,
-              child: Text('${user.name}\n@${user.username}'),
+              child: Text(
+                '${user.name}\n@${user.username}',
+                style: const TextStyle(color: Colors.black),
+              ),
             ),
             Positioned(
               left: 15,
@@ -118,7 +107,10 @@ class AlbumCard extends ConsumerWidget {
                 width: 160,
                 child: Text(
                   album.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                   maxLines: 2,
                 ),
               ),

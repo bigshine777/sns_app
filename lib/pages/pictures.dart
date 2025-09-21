@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sns_app/models/picture.dart';
 import 'package:sns_app/notifiers.dart';
+import 'package:sns_app/pages/app_bar.dart';
 import 'package:sns_app/pages/footer.dart';
 
 class PicturesPage extends ConsumerWidget {
@@ -13,22 +14,7 @@ class PicturesPage extends ConsumerWidget {
     final picturesAsync = ref.watch(picturesNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              '写真',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.blue[400],
-      ),
+      appBar: const CustomAppBar(title: '写真', isSetting: false),
       body: picturesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Text('Error: $err'),
